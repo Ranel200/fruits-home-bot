@@ -47,14 +47,25 @@ async function loadFruits() {
     try {
         // Пробуем загрузить с API
         const apiUrl = window.location.origin + '/api/fruits';
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
         if (response.ok) {
-            fruits = await response.json();
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                fruits = data;
+            } else {
+                throw new Error('API вернул пустой массив');
+            }
         } else {
-            throw new Error('Backend недоступен');
+            throw new Error(`API вернул статус ${response.status}`);
         }
     } catch (error) {
-        console.log('Используются встроенные данные о фруктах');
+        console.log('API недоступен, используем встроенные данные:', error);
         fruits = defaultFruits;
     }
     renderFruits();
