@@ -77,8 +77,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Экспорт для Vercel
-module.exports = app;
+// Экспорт для Vercel (serverless функция)
+module.exports = (req, res) => {
+  // Обработка всех запросов через Express
+  return app(req, res);
+};
 
 // Запуск локально (если не в Vercel)
 if (require.main === module) {
