@@ -44,6 +44,10 @@ const overlay = document.getElementById('overlay');
 
 // Загрузка фруктов
 async function loadFruits() {
+    // Сначала устанавливаем встроенные данные (на случай если API не работает)
+    fruits = [...defaultFruits];
+    renderFruits();
+    
     try {
         // Пробуем загрузить с API
         const apiUrl = window.location.origin + '/api/fruits';
@@ -51,29 +55,36 @@ async function loadFruits() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            timeout: 5000
         });
         
         if (response.ok) {
             const data = await response.json();
             if (Array.isArray(data) && data.length > 0) {
                 fruits = data;
-            } else {
-                throw new Error('API вернул пустой массив');
+                renderFruits();
             }
-        } else {
-            throw new Error(`API вернул статус ${response.status}`);
         }
     } catch (error) {
         console.log('API недоступен, используем встроенные данные:', error);
-        fruits = defaultFruits;
+        // fruits уже установлены в defaultFruits выше
     }
-    renderFruits();
 }
 
 // Отображение фруктов
 function renderFruits() {
+    if (!fruitsGrid) {
+        console.error('fruitsGrid не найден');
+        return;
+    }
+    
     fruitsGrid.innerHTML = '';
+    
+    if (!fruits || fruits.length === 0) {
+        fruitsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Загрузка фруктов...</p>';
+        return;
+    }
     
     const filtered = fruits.filter(fruit => {
         const matchesCategory = currentCategory === 'all' || fruit.category === currentCategory;
