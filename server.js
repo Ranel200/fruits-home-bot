@@ -19,7 +19,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(bodyParser.json());
-app.use(express.static('public'));
+// Статические файлы обслуживаются Vercel автоматически из папки public
 
 // Данные о фруктах
 const fruits = [
