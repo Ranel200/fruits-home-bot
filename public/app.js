@@ -86,7 +86,6 @@ const registerScreen = document.getElementById('registerScreen');
 const mainContainer = document.getElementById('mainContainer');
 const registerForm = document.getElementById('registerForm');
 const fruitsGrid = document.getElementById('fruitsGrid');
-const catalogGrid = document.getElementById('catalogGrid');
 const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const checkoutBtn = document.getElementById('checkoutBtn');
@@ -102,8 +101,6 @@ const profileInfo = document.getElementById('profileInfo');
 const editProfileForm = document.getElementById('editProfileForm');
 const updateProfileForm = document.getElementById('updateProfileForm');
 const cancelEditBtn = document.getElementById('cancelEditBtn');
-const catalogCategoryBtns = document.querySelectorAll('.catalog-category-btn');
-let catalogCategory = 'all';
 
 // Проверка регистрации
 function checkRegistration() {
@@ -217,9 +214,6 @@ function switchPage(page) {
     if (page === 'home') {
         document.getElementById('homePage').style.display = 'block';
         renderFruits(fruitsGrid);
-    } else if (page === 'catalog') {
-        document.getElementById('catalogPage').style.display = 'block';
-        renderCatalogFruits();
     } else if (page === 'cart') {
         document.getElementById('cartPage').style.display = 'block';
         updateCartUI();
@@ -316,44 +310,6 @@ function renderFruits(container) {
     });
 }
 
-// Отображение фруктов в каталоге с фильтрацией по категориям
-function renderCatalogFruits() {
-    if (!catalogGrid) {
-        console.error('catalogGrid не найден!');
-        return;
-    }
-    
-    catalogGrid.innerHTML = '';
-    
-    if (!fruits || fruits.length === 0) {
-        catalogGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Загрузка фруктов...</p>';
-        return;
-    }
-    
-    const filtered = fruits.filter(fruit => {
-        return catalogCategory === 'all' || fruit.category === catalogCategory;
-    });
-
-    if (filtered.length === 0) {
-        catalogGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Фрукты не найдены</p>';
-        return;
-    }
-
-    filtered.forEach(fruit => {
-        const card = document.createElement('div');
-        card.className = 'fruit-card';
-        card.innerHTML = `
-            <div class="fruit-emoji">${fruit.image}</div>
-            <div class="fruit-name">${fruit.name}</div>
-            <div class="fruit-description">${fruit.description}</div>
-            <div class="fruit-price">${fruit.price} ₽</div>
-            <button class="add-to-cart-btn" onclick="addToCart(${fruit.id})">
-                В корзину
-            </button>
-        `;
-        catalogGrid.appendChild(card);
-    });
-}
 
 // Добавление в корзину
 function addToCart(fruitId) {
@@ -527,16 +483,6 @@ categoryBtns.forEach(btn => {
         btn.classList.add('active');
         currentCategory = btn.dataset.category;
         renderFruits(fruitsGrid);
-    });
-});
-
-// Фильтр по категориям в каталоге
-catalogCategoryBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        catalogCategoryBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        catalogCategory = btn.dataset.category;
-        renderCatalogFruits();
     });
 });
 
