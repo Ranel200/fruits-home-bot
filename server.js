@@ -19,7 +19,20 @@ app.use(cors({
   credentials: true
 }));
 app.use(bodyParser.json());
-// Статические файлы обслуживаются Vercel автоматически из папки public
+
+// Обслуживание статических файлов с правильными MIME типами
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath);
+    if (ext === '.css') {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    } else if (ext === '.js') {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    } else if (ext === '.html') {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    }
+  }
+}));
 
 // Данные о фруктах
 const fruits = [
