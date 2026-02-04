@@ -1,3 +1,6 @@
+// Загрузка переменных окружения из .env файла
+require('dotenv').config();
+
 const TelegramBot = require('node-telegram-bot-api');
 
 // Токен бота (получите у @BotFather)
