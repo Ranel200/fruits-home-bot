@@ -98,6 +98,12 @@ const profileName = document.getElementById('profileName');
 const profilePhone = document.getElementById('profilePhone');
 const profileAddress = document.getElementById('profileAddress');
 const editProfileBtn = document.getElementById('editProfileBtn');
+const profileInfo = document.getElementById('profileInfo');
+const editProfileForm = document.getElementById('editProfileForm');
+const updateProfileForm = document.getElementById('updateProfileForm');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+const catalogCategoryBtns = document.querySelectorAll('.catalog-category-btn');
+let catalogCategory = 'all';
 
 // Проверка регистрации
 function checkRegistration() {
@@ -135,9 +141,31 @@ registerForm.addEventListener('submit', (e) => {
 
 // Редактирование профиля
 editProfileBtn.addEventListener('click', () => {
-    const name = prompt('Введите имя:', userProfile.name);
-    const phone = prompt('Введите телефон:', userProfile.phone);
-    const address = prompt('Введите адрес:', userProfile.address);
+    // Заполняем форму текущими данными
+    document.getElementById('editName').value = userProfile.name;
+    document.getElementById('editPhone').value = userProfile.phone;
+    document.getElementById('editAddress').value = userProfile.address;
+    
+    // Показываем форму, скрываем просмотр
+    profileInfo.style.display = 'none';
+    editProfileBtn.style.display = 'none';
+    editProfileForm.style.display = 'block';
+});
+
+// Отмена редактирования
+cancelEditBtn.addEventListener('click', () => {
+    profileInfo.style.display = 'block';
+    editProfileBtn.style.display = 'block';
+    editProfileForm.style.display = 'none';
+});
+
+// Сохранение профиля
+updateProfileForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('editName').value;
+    const phone = document.getElementById('editPhone').value;
+    const address = document.getElementById('editAddress').value;
     
     if (name && phone && address) {
         userProfile = {
@@ -148,6 +176,12 @@ editProfileBtn.addEventListener('click', () => {
         };
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
         updateProfileDisplay();
+        
+        // Скрываем форму, показываем просмотр
+        profileInfo.style.display = 'block';
+        editProfileBtn.style.display = 'block';
+        editProfileForm.style.display = 'none';
+        
         showNotification('Профиль обновлен!', 'success');
     }
 });
@@ -185,13 +219,17 @@ function switchPage(page) {
         renderFruits(fruitsGrid);
     } else if (page === 'catalog') {
         document.getElementById('catalogPage').style.display = 'block';
-        renderFruits(catalogGrid);
+        renderCatalogFruits();
     } else if (page === 'cart') {
         document.getElementById('cartPage').style.display = 'block';
         updateCartUI();
     } else if (page === 'profile') {
         document.getElementById('profilePage').style.display = 'block';
         updateProfileDisplay();
+        // Убеждаемся, что форма скрыта при открытии профиля
+        profileInfo.style.display = 'block';
+        editProfileBtn.style.display = 'block';
+        editProfileForm.style.display = 'none';
     }
 }
 
@@ -275,6 +313,45 @@ function renderFruits(container) {
             </button>
         `;
         container.appendChild(card);
+    });
+}
+
+// Отображение фруктов в каталоге с фильтрацией по категориям
+function renderCatalogFruits() {
+    if (!catalogGrid) {
+        console.error('catalogGrid не найден!');
+        return;
+    }
+    
+    catalogGrid.innerHTML = '';
+    
+    if (!fruits || fruits.length === 0) {
+        catalogGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Загрузка фруктов...</p>';
+        return;
+    }
+    
+    const filtered = fruits.filter(fruit => {
+        return catalogCategory === 'all' || fruit.category === catalogCategory;
+    });
+
+    if (filtered.length === 0) {
+        catalogGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Фрукты не найдены</p>';
+        return;
+    }
+
+    filtered.forEach(fruit => {
+        const card = document.createElement('div');
+        card.className = 'fruit-card';
+        card.innerHTML = `
+            <div class="fruit-emoji">${fruit.image}</div>
+            <div class="fruit-name">${fruit.name}</div>
+            <div class="fruit-description">${fruit.description}</div>
+            <div class="fruit-price">${fruit.price} ₽</div>
+            <button class="add-to-cart-btn" onclick="addToCart(${fruit.id})">
+                В корзину
+            </button>
+        `;
+        catalogGrid.appendChild(card);
     });
 }
 
@@ -443,13 +520,23 @@ searchInput.addEventListener('input', (e) => {
     renderFruits(fruitsGrid);
 });
 
-// Фильтр по категориям
+// Фильтр по категориям на главной
 categoryBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         categoryBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentCategory = btn.dataset.category;
         renderFruits(fruitsGrid);
+    });
+});
+
+// Фильтр по категориям в каталоге
+catalogCategoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        catalogCategoryBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        catalogCategory = btn.dataset.category;
+        renderCatalogFruits();
     });
 });
 

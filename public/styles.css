@@ -481,6 +481,38 @@ header h1 {
     border-top: 1px solid #eee;
 }
 
+/* Категории в каталоге */
+.catalog-categories {
+    display: flex;
+    gap: 10px;
+    margin: 15px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.catalog-categories::-webkit-scrollbar {
+    height: 0;
+}
+
+.catalog-category-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: white;
+    color: #667eea;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.catalog-category-btn.active {
+    background: #667eea;
+    color: white;
+}
+
 /* Страница профиля */
 .profile-content {
     padding: 20px;
@@ -532,6 +564,61 @@ header h1 {
 
 .edit-profile-btn:hover {
     background: #5568d3;
+}
+
+/* Форма редактирования профиля */
+.edit-profile-form {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.edit-profile-form h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 20px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-profile-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #667eea;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.save-profile-btn:hover {
+    background: #5568d3;
+}
+
+.cancel-profile-btn {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cancel-profile-btn:hover {
+    background: #f5f5f5;
 }
 
 @media (max-width: 480px) {

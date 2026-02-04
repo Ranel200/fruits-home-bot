@@ -60,6 +60,12 @@
             <header>
                 <h1>📋 Каталог</h1>
             </header>
+            <div class="catalog-categories">
+                <button class="catalog-category-btn active" data-category="all">Все</button>
+                <button class="catalog-category-btn" data-category="berries">Ягоды</button>
+                <button class="catalog-category-btn" data-category="exotic">Экзотика</button>
+                <button class="catalog-category-btn" data-category="fruits">Фрукты</button>
+            </div>
             <div class="fruits-grid" id="catalogGrid">
                 <!-- Фрукты будут загружены через JS -->
             </div>
@@ -90,6 +96,7 @@
                 <h1>👤 Профиль</h1>
             </header>
             <div class="profile-content">
+                <!-- Просмотр профиля -->
                 <div class="profile-info" id="profileInfo">
                     <div class="profile-item">
                         <span class="profile-label">Имя:</span>
@@ -105,6 +112,29 @@
                     </div>
                 </div>
                 <button class="edit-profile-btn" id="editProfileBtn">Редактировать профиль</button>
+                
+                <!-- Форма редактирования -->
+                <div class="edit-profile-form" id="editProfileForm" style="display: none;">
+                    <h2>Редактирование профиля</h2>
+                    <form id="updateProfileForm">
+                        <div class="form-group">
+                            <label>Имя</label>
+                            <input type="text" id="editName" required placeholder="Введите ваше имя">
+                        </div>
+                        <div class="form-group">
+                            <label>Телефон</label>
+                            <input type="tel" id="editPhone" required placeholder="+7 (999) 123-45-67">
+                        </div>
+                        <div class="form-group">
+                            <label>Адрес доставки</label>
+                            <input type="text" id="editAddress" required placeholder="Введите адрес">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="save-profile-btn">Сохранить</button>
+                            <button type="button" class="cancel-profile-btn" id="cancelEditBtn">Отмена</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
