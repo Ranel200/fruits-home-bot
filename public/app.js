@@ -44,27 +44,33 @@ const overlay = document.getElementById('overlay');
 
 // Загрузка фруктов
 async function loadFruits() {
+    console.log('Загрузка фруктов...');
+    
     // Сначала устанавливаем встроенные данные (на случай если API не работает)
     fruits = [...defaultFruits];
+    console.log('Установлены встроенные фрукты:', fruits.length);
     renderFruits();
     
     try {
         // Пробуем загрузить с API
         const apiUrl = window.location.origin + '/api/fruits';
+        console.log('Попытка загрузить с API:', apiUrl);
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            timeout: 5000
+            }
         });
         
         if (response.ok) {
             const data = await response.json();
+            console.log('Получены данные с API:', data.length);
             if (Array.isArray(data) && data.length > 0) {
                 fruits = data;
                 renderFruits();
             }
+        } else {
+            console.log('API вернул статус:', response.status);
         }
     } catch (error) {
         console.log('API недоступен, используем встроенные данные:', error);
@@ -74,18 +80,22 @@ async function loadFruits() {
 
 // Отображение фруктов
 function renderFruits() {
+    console.log('renderFruits вызвана, fruits:', fruits?.length);
+    
     if (!fruitsGrid) {
-        console.error('fruitsGrid не найден');
+        console.error('fruitsGrid не найден!');
         return;
     }
     
     fruitsGrid.innerHTML = '';
     
     if (!fruits || fruits.length === 0) {
+        console.log('Нет фруктов для отображения');
         fruitsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Загрузка фруктов...</p>';
         return;
     }
     
+    console.log('Фильтрация фруктов, категория:', currentCategory, 'поиск:', searchQuery);
     const filtered = fruits.filter(fruit => {
         const matchesCategory = currentCategory === 'all' || fruit.category === currentCategory;
         const matchesSearch = fruit.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -93,6 +103,7 @@ function renderFruits() {
         return matchesCategory && matchesSearch;
     });
 
+    console.log('Отфильтровано фруктов:', filtered.length);
     if (filtered.length === 0) {
         fruitsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Фрукты не найдены</p>';
         return;
@@ -294,9 +305,16 @@ categoryBtns.forEach(btn => {
     });
 });
 
-// Инициализация
-loadFruits();
-updateCartUI();
+// Инициализация после загрузки DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        loadFruits();
+        updateCartUI();
+    });
+} else {
+    loadFruits();
+    updateCartUI();
+}
 
 // Экспорт функций для использования в onclick
 window.addToCart = addToCart;
