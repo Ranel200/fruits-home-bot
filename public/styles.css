@@ -118,6 +118,14 @@ header h1 {
     text-align: center;
 }
 
+.main-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin: 0;
+}
+
 .search-bar {
     margin-bottom: 15px;
 }
@@ -228,6 +236,48 @@ header h1 {
 
 .add-to-cart-btn:active {
     transform: scale(0.98);
+}
+
+/* Контролы количества в карточке */
+.fruit-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quantity-control-btn {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 50%;
+    background: #667eea;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.quantity-control-btn:hover {
+    background: #5568d3;
+    transform: scale(1.1);
+}
+
+.quantity-control-btn:active {
+    transform: scale(0.95);
+}
+
+.quantity-display {
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+    color: #333;
 }
 
 .cart-sidebar {
@@ -619,6 +669,177 @@ header h1 {
 
 .cancel-profile-btn:hover {
     background: #f5f5f5;
+}
+
+/* Страница оформления заказа */
+.checkout-content {
+    padding: 20px;
+}
+
+.checkout-content .form-group {
+    margin-bottom: 20px;
+}
+
+.checkout-content textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s;
+}
+
+.checkout-content textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.checkout-content select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.checkout-content select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.checkout-summary {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.checkout-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.confirm-order-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 10px;
+}
+
+.confirm-order-btn:hover {
+    background: #45a049;
+}
+
+.cancel-checkout-btn {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cancel-checkout-btn:hover {
+    background: #f5f5f5;
+}
+
+/* Заказы в профиле */
+.orders-section {
+    margin-top: 30px;
+}
+
+.orders-section h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.no-orders {
+    text-align: center;
+    color: #999;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+}
+
+.order-card {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-number {
+    font-weight: 600;
+    color: #333;
+}
+
+.order-date {
+    color: #666;
+    font-size: 14px;
+}
+
+.order-items {
+    margin: 10px 0;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.order-total {
+    font-weight: 600;
+    color: #333;
+}
+
+.order-status {
+    padding: 5px 15px;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 @media (max-width: 480px) {

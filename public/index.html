@@ -36,16 +36,17 @@
         <!-- Главная страница -->
         <div class="page" id="homePage">
             <header>
-                <h1>🍎 Фрукты Дома</h1>
+                <h1 class="main-title">🍎 Свежие фрукты каждый день</h1>
             </header>
 
             <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Поиск фруктов...">
+                <input type="text" id="searchInput" placeholder="🔍 Поиск по фруктам">
             </div>
 
             <div class="categories">
                 <button class="category-btn active" data-category="all">Все</button>
-                <button class="category-btn" data-category="fruits">Фрукты</button>
+                <button class="category-btn" data-category="apples">Яблоки</button>
+                <button class="category-btn" data-category="citrus">Цитрусовые</button>
                 <button class="category-btn" data-category="berries">Ягоды</button>
                 <button class="category-btn" data-category="exotic">Экзотика</button>
             </div>
@@ -74,6 +75,43 @@
             </div>
         </div>
 
+        <!-- Страница оформления заказа -->
+        <div class="page" id="checkoutPage" style="display: none;">
+            <header>
+                <h1>📦 Оформление заказа</h1>
+            </header>
+            <div class="checkout-content">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label>Адрес доставки *</label>
+                        <input type="text" id="checkoutAddress" required placeholder="Введите адрес доставки">
+                    </div>
+                    <div class="form-group">
+                        <label>Комментарий к заказу</label>
+                        <textarea id="checkoutComment" rows="3" placeholder="Дополнительные пожелания (необязательно)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Способ оплаты *</label>
+                        <select id="checkoutPayment" required>
+                            <option value="">Выберите способ оплаты</option>
+                            <option value="cash">Наличными при получении</option>
+                            <option value="online">Онлайн оплата</option>
+                        </select>
+                    </div>
+                    <div class="checkout-summary">
+                        <div class="checkout-total">
+                            <span>Итого к оплате:</span>
+                            <span id="checkoutTotal">0 ₽</span>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="confirm-order-btn">Подтвердить заказ</button>
+                        <button type="button" class="cancel-checkout-btn" id="cancelCheckoutBtn">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Страница профиля -->
         <div class="page" id="profilePage" style="display: none;">
             <header>
@@ -96,6 +134,14 @@
                     </div>
                 </div>
                 <button class="edit-profile-btn" id="editProfileBtn">Редактировать профиль</button>
+                
+                <!-- Мои заказы -->
+                <div class="orders-section">
+                    <h2>Мои заказы</h2>
+                    <div class="orders-list" id="ordersList">
+                        <p class="no-orders">У вас пока нет заказов</p>
+                    </div>
+                </div>
                 
                 <!-- Форма редактирования -->
                 <div class="edit-profile-form" id="editProfileForm" style="display: none;">

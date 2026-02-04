@@ -111,16 +111,18 @@ tg.expand();
 
 // Данные о фруктах (встроенные, если нет backend)
 const defaultFruits = [
-    { id: 1, name: 'Яблоки', price: 150, image: '🍎', description: 'Свежие красные яблоки', category: 'fruits' },
-    { id: 2, name: 'Бананы', price: 120, image: '🍌', description: 'Спелые желтые бананы', category: 'fruits' },
-    { id: 3, name: 'Апельсины', price: 180, image: '🍊', description: 'Сочные апельсины', category: 'fruits' },
-    { id: 4, name: 'Клубника', price: 250, image: '🍓', description: 'Свежая клубника', category: 'berries' },
-    { id: 5, name: 'Виноград', price: 200, image: '🍇', description: 'Сладкий виноград', category: 'fruits' },
-    { id: 6, name: 'Манго', price: 300, image: '🥭', description: 'Экзотическое манго', category: 'exotic' },
-    { id: 7, name: 'Ананас', price: 350, image: '🍍', description: 'Свежий ананас', category: 'exotic' },
-    { id: 8, name: 'Киви', price: 220, image: '🥝', description: 'Витаминный киви', category: 'fruits' },
-    { id: 9, name: 'Груши', price: 170, image: '🍐', description: 'Сочные груши', category: 'fruits' },
-    { id: 10, name: 'Черешня', price: 280, image: '🍒', description: 'Сладкая черешня', category: 'berries' }
+    { id: 1, name: 'Яблоки', price: 150, image: '🍎', description: 'Свежие красные яблоки', category: 'apples', unit: 'кг' },
+    { id: 2, name: 'Бананы', price: 120, image: '🍌', description: 'Спелые желтые бананы', category: 'exotic', unit: 'кг' },
+    { id: 3, name: 'Апельсины', price: 180, image: '🍊', description: 'Сочные апельсины', category: 'citrus', unit: 'кг' },
+    { id: 4, name: 'Клубника', price: 250, image: '🍓', description: 'Свежая клубника', category: 'berries', unit: 'кг' },
+    { id: 5, name: 'Виноград', price: 200, image: '🍇', description: 'Сладкий виноград', category: 'berries', unit: 'кг' },
+    { id: 6, name: 'Манго', price: 300, image: '🥭', description: 'Экзотическое манго', category: 'exotic', unit: 'шт' },
+    { id: 7, name: 'Ананас', price: 350, image: '🍍', description: 'Свежий ананас', category: 'exotic', unit: 'шт' },
+    { id: 8, name: 'Киви', price: 220, image: '🥝', description: 'Витаминный киви', category: 'exotic', unit: 'кг' },
+    { id: 9, name: 'Груши', price: 170, image: '🍐', description: 'Сочные груши', category: 'apples', unit: 'кг' },
+    { id: 10, name: 'Черешня', price: 280, image: '🍒', description: 'Сладкая черешня', category: 'berries', unit: 'кг' },
+    { id: 11, name: 'Лимон', price: 160, image: '🍋', description: 'Свежий лимон', category: 'citrus', unit: 'кг' },
+    { id: 12, name: 'Грейпфрут', price: 200, image: '🍊', description: 'Сочный грейпфрут', category: 'citrus', unit: 'шт' }
 ];
 
 // Состояние приложения
@@ -154,6 +156,22 @@ const cancelEditBtn = document.getElementById('cancelEditBtn');
 
 // Проверка регистрации
 function checkRegistration() {
+    // Пробуем автоматически зарегистрировать через Telegram
+    const tgUser = tg.initDataUnsafe?.user;
+    
+    if (!userProfile && tgUser) {
+        // Автоматическая регистрация через Telegram
+        userProfile = {
+            user_id: tgUser.id,
+            name: tgUser.first_name || tgUser.username || 'Пользователь',
+            phone: '',
+            address: '',
+            registeredAt: new Date().toISOString(),
+            registeredVia: 'telegram'
+        };
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    }
+    
     if (!userProfile) {
         registerScreen.style.display = 'flex';
         mainContainer.style.display = 'none';
@@ -270,6 +288,7 @@ function switchPage(page) {
     } else if (page === 'profile') {
         document.getElementById('profilePage').style.display = 'block';
         updateProfileDisplay();
+        renderOrders();
         // Убеждаемся, что форма скрыта при открытии профиля
         profileInfo.style.display = 'block';
         editProfileBtn.style.display = 'block';
@@ -347,14 +366,25 @@ function renderFruits(container) {
     filtered.forEach(fruit => {
         const card = document.createElement('div');
         card.className = 'fruit-card';
+        const cartItem = cart.find(item => item.id === fruit.id);
+        const quantity = cartItem ? cartItem.quantity : 0;
+        
         card.innerHTML = `
             <div class="fruit-emoji">${fruit.image}</div>
             <div class="fruit-name">${fruit.name}</div>
             <div class="fruit-description">${fruit.description}</div>
-            <div class="fruit-price">${fruit.price} ₽</div>
-            <button class="add-to-cart-btn" onclick="addToCart(${fruit.id})">
-                В корзину
-            </button>
+            <div class="fruit-price">${fruit.price} ₽ / ${fruit.unit || 'кг'}</div>
+            <div class="fruit-controls">
+                ${quantity > 0 ? `
+                    <button class="quantity-control-btn minus" onclick="updateCartFromCard(${fruit.id}, -1)">-</button>
+                    <span class="quantity-display">${quantity}</span>
+                    <button class="quantity-control-btn plus" onclick="updateCartFromCard(${fruit.id}, 1)">+</button>
+                ` : `
+                    <button class="add-to-cart-btn" onclick="addToCart(${fruit.id})">
+                        В корзину
+                    </button>
+                `}
+            </div>
         `;
         container.appendChild(card);
     });
@@ -379,8 +409,38 @@ function addToCart(fruitId) {
 
     saveCart();
     updateCartUI();
+    renderFruits(fruitsGrid); // Обновляем карточки
     
     // Вибрация (если поддерживается)
+    if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+    }
+}
+
+// Обновление корзины из карточки фрукта
+function updateCartFromCard(fruitId, change) {
+    const fruit = fruits.find(f => f.id === fruitId);
+    if (!fruit) return;
+
+    const existingItem = cart.find(item => item.id === fruitId);
+    
+    if (existingItem) {
+        existingItem.quantity += change;
+        if (existingItem.quantity <= 0) {
+            cart = cart.filter(item => item.id !== fruitId);
+        }
+    } else if (change > 0) {
+        cart.push({
+            ...fruit,
+            quantity: 1
+        });
+    }
+
+    saveCart();
+    updateCartUI();
+    renderFruits(fruitsGrid); // Обновляем карточки
+    
+    // Вибрация
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');
     }
@@ -460,10 +520,34 @@ function updateCartUI() {
     cartTotal.textContent = `${total} ₽`;
 }
 
-// Оформление заказа
-async function checkout() {
+// Оформление заказа - открытие страницы оформления
+function checkout() {
     if (cart.length === 0) return;
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    document.getElementById('checkoutTotal').textContent = `${total} ₽`;
+    
+    // Заполняем адрес из профиля, если есть
+    if (userProfile && userProfile.address) {
+        document.getElementById('checkoutAddress').value = userProfile.address;
+    }
+    
+    // Показываем страницу оформления
+    document.getElementById('checkoutPage').style.display = 'block';
+    document.getElementById('cartPage').style.display = 'none';
+}
 
+// Подтверждение заказа
+async function confirmOrder() {
+    const address = document.getElementById('checkoutAddress').value;
+    const comment = document.getElementById('checkoutComment').value;
+    const payment = document.getElementById('checkoutPayment').value;
+    
+    if (!address || !payment) {
+        showNotification('Заполните все обязательные поля', 'error');
+        return;
+    }
+    
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const user = tg.initDataUnsafe?.user || {};
 
@@ -477,10 +561,14 @@ async function checkout() {
             body: JSON.stringify({
                 items: cart,
                 total: total,
+                address: address,
+                comment: comment,
+                payment: payment,
                 user: {
-                    id: user.id,
-                    first_name: user.first_name,
+                    id: user.id || userProfile?.user_id,
+                    first_name: user.first_name || userProfile?.name,
                     username: user.username,
+                    phone: userProfile?.phone || '',
                     ...userProfile
                 }
             })
@@ -489,10 +577,25 @@ async function checkout() {
         const result = await response.json();
 
         if (result.success) {
+            // Сохраняем заказ в историю
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.unshift({
+                ...result.order,
+                address,
+                comment,
+                payment,
+                status: 'Принят'
+            });
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
             // Очистка корзины
             cart = [];
             saveCart();
             updateCartUI();
+            renderFruits(fruitsGrid);
+            
+            // Закрываем страницу оформления
+            document.getElementById('checkoutPage').style.display = 'none';
             switchPage('home');
 
             // Показ уведомления
@@ -517,6 +620,72 @@ async function checkout() {
 
 // Обработчики событий
 checkoutBtn.addEventListener('click', checkout);
+
+// Обработка формы оформления заказа
+const checkoutForm = document.getElementById('checkoutForm');
+if (checkoutForm) {
+    checkoutForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        confirmOrder();
+    });
+}
+
+// Отмена оформления заказа
+const cancelCheckoutBtn = document.getElementById('cancelCheckoutBtn');
+if (cancelCheckoutBtn) {
+    cancelCheckoutBtn.addEventListener('click', () => {
+        document.getElementById('checkoutPage').style.display = 'none';
+        switchPage('cart');
+    });
+}
+
+// Отображение заказов в профиле
+function renderOrders() {
+    const ordersList = document.getElementById('ordersList');
+    if (!ordersList) return;
+    
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    
+    if (orders.length === 0) {
+        ordersList.innerHTML = '<p class="no-orders">У вас пока нет заказов</p>';
+        return;
+    }
+    
+    ordersList.innerHTML = orders.map((order, index) => {
+        const statusColors = {
+            'Принят': '#2196F3',
+            'Готовится': '#FF9800',
+            'В пути': '#9C27B0',
+            'Доставлен': '#4CAF50'
+        };
+        
+        return `
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-number">Заказ #${order.id || index + 1}</span>
+                    <span class="order-date">${new Date(order.createdAt || Date.now()).toLocaleDateString('ru-RU')}</span>
+                </div>
+                <div class="order-items">
+                    ${order.items.map(item => `
+                        <div class="order-item">
+                            <span>${item.image} ${item.name} x${item.quantity}</span>
+                            <span>${item.price * item.quantity} ₽</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="order-footer">
+                    <div class="order-total">
+                        <span>Итого:</span>
+                        <span>${order.total} ₽</span>
+                    </div>
+                    <div class="order-status" style="background: ${statusColors[order.status] || '#999'};">
+                        ${order.status || 'Принят'}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
 // Поиск
 searchInput.addEventListener('input', (e) => {
