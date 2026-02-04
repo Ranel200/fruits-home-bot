@@ -8,48 +8,129 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🍎 Фрукты Дома</h1>
-            <div class="cart-icon" id="cartIcon">
-                🛒 <span id="cartCount">0</span>
-            </div>
-        </header>
-
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Поиск фруктов...">
-        </div>
-
-        <div class="categories">
-            <button class="category-btn active" data-category="all">Все</button>
-            <button class="category-btn" data-category="fruits">Фрукты</button>
-            <button class="category-btn" data-category="berries">Ягоды</button>
-            <button class="category-btn" data-category="exotic">Экзотика</button>
-        </div>
-
-        <div class="fruits-grid" id="fruitsGrid">
-            <!-- Фрукты будут загружены через JS -->
-        </div>
-
-        <div class="cart-sidebar" id="cartSidebar">
-            <div class="cart-header">
-                <h2>Корзина</h2>
-                <button class="close-cart" id="closeCart">✕</button>
-            </div>
-            <div class="cart-items" id="cartItems">
-                <p class="empty-cart">Корзина пуста</p>
-            </div>
-            <div class="cart-footer">
-                <div class="cart-total">
-                    <span>Итого:</span>
-                    <span id="cartTotal">0 ₽</span>
+    <!-- Экран регистрации -->
+    <div class="screen" id="registerScreen">
+        <div class="register-container">
+            <h1>🍎 Добро пожаловать!</h1>
+            <p class="register-subtitle">Заполните данные для регистрации</p>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="registerName" required placeholder="Введите ваше имя">
                 </div>
-                <button class="checkout-btn" id="checkoutBtn">Оформить заказ</button>
+                <div class="form-group">
+                    <label>Телефон</label>
+                    <input type="tel" id="registerPhone" required placeholder="+7 (999) 123-45-67">
+                </div>
+                <div class="form-group">
+                    <label>Адрес доставки</label>
+                    <input type="text" id="registerAddress" required placeholder="Введите адрес">
+                </div>
+                <button type="submit" class="register-btn">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="container" id="mainContainer" style="display: none;">
+        <!-- Главная страница -->
+        <div class="page" id="homePage">
+            <header>
+                <h1>🍎 Фрукты Дома</h1>
+            </header>
+
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Поиск фруктов...">
+            </div>
+
+            <div class="categories">
+                <button class="category-btn active" data-category="all">Все</button>
+                <button class="category-btn" data-category="fruits">Фрукты</button>
+                <button class="category-btn" data-category="berries">Ягоды</button>
+                <button class="category-btn" data-category="exotic">Экзотика</button>
+            </div>
+
+            <div class="fruits-grid" id="fruitsGrid">
+                <!-- Фрукты будут загружены через JS -->
             </div>
         </div>
 
-        <div class="overlay" id="overlay"></div>
+        <!-- Страница каталога -->
+        <div class="page" id="catalogPage" style="display: none;">
+            <header>
+                <h1>📋 Каталог</h1>
+            </header>
+            <div class="fruits-grid" id="catalogGrid">
+                <!-- Фрукты будут загружены через JS -->
+            </div>
+        </div>
+
+        <!-- Страница корзины -->
+        <div class="page" id="cartPage" style="display: none;">
+            <header>
+                <h1>🛒 Корзина</h1>
+            </header>
+            <div class="cart-content">
+                <div class="cart-items" id="cartItems">
+                    <p class="empty-cart">Корзина пуста</p>
+                </div>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <span>Итого:</span>
+                        <span id="cartTotal">0 ₽</span>
+                    </div>
+                    <button class="checkout-btn" id="checkoutBtn">Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница профиля -->
+        <div class="page" id="profilePage" style="display: none;">
+            <header>
+                <h1>👤 Профиль</h1>
+            </header>
+            <div class="profile-content">
+                <div class="profile-info" id="profileInfo">
+                    <div class="profile-item">
+                        <span class="profile-label">Имя:</span>
+                        <span class="profile-value" id="profileName">-</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Телефон:</span>
+                        <span class="profile-value" id="profilePhone">-</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Адрес:</span>
+                        <span class="profile-value" id="profileAddress">-</span>
+                    </div>
+                </div>
+                <button class="edit-profile-btn" id="editProfileBtn">Редактировать профиль</button>
+            </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Главная</span>
+            </button>
+            <button class="nav-btn" data-page="catalog">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Каталог</span>
+            </button>
+            <button class="nav-btn" data-page="cart">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">Корзина</span>
+                <span class="nav-badge" id="navCartCount" style="display: none;">0</span>
+            </button>
+            <button class="nav-btn" data-page="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+            </button>
+        </nav>
     </div>
+
+    <div class="overlay" id="overlay"></div>
 
     <script src="app.js?v=2"></script>
 </body>

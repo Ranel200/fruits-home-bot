@@ -78,19 +78,122 @@ let fruits = [];
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let currentCategory = 'all';
 let searchQuery = '';
+let currentPage = 'home';
+let userProfile = JSON.parse(localStorage.getItem('userProfile')) || null;
 
 // Элементы DOM
+const registerScreen = document.getElementById('registerScreen');
+const mainContainer = document.getElementById('mainContainer');
+const registerForm = document.getElementById('registerForm');
 const fruitsGrid = document.getElementById('fruitsGrid');
-const cartIcon = document.getElementById('cartIcon');
-const cartSidebar = document.getElementById('cartSidebar');
-const closeCart = document.getElementById('closeCart');
+const catalogGrid = document.getElementById('catalogGrid');
 const cartItems = document.getElementById('cartItems');
-const cartCount = document.getElementById('cartCount');
 const cartTotal = document.getElementById('cartTotal');
 const checkoutBtn = document.getElementById('checkoutBtn');
 const searchInput = document.getElementById('searchInput');
 const categoryBtns = document.querySelectorAll('.category-btn');
-const overlay = document.getElementById('overlay');
+const navBtns = document.querySelectorAll('.nav-btn');
+const navCartCount = document.getElementById('navCartCount');
+const profileName = document.getElementById('profileName');
+const profilePhone = document.getElementById('profilePhone');
+const profileAddress = document.getElementById('profileAddress');
+const editProfileBtn = document.getElementById('editProfileBtn');
+
+// Проверка регистрации
+function checkRegistration() {
+    if (!userProfile) {
+        registerScreen.style.display = 'flex';
+        mainContainer.style.display = 'none';
+    } else {
+        registerScreen.style.display = 'none';
+        mainContainer.style.display = 'block';
+        updateProfileDisplay();
+    }
+}
+
+// Обработка регистрации
+registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('registerName').value;
+    const phone = document.getElementById('registerPhone').value;
+    const address = document.getElementById('registerAddress').value;
+    
+    if (name && phone && address) {
+        userProfile = {
+            name,
+            phone,
+            address,
+            registeredAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        checkRegistration();
+        showNotification('Регистрация успешна!', 'success');
+    }
+});
+
+// Редактирование профиля
+editProfileBtn.addEventListener('click', () => {
+    const name = prompt('Введите имя:', userProfile.name);
+    const phone = prompt('Введите телефон:', userProfile.phone);
+    const address = prompt('Введите адрес:', userProfile.address);
+    
+    if (name && phone && address) {
+        userProfile = {
+            ...userProfile,
+            name,
+            phone,
+            address
+        };
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        updateProfileDisplay();
+        showNotification('Профиль обновлен!', 'success');
+    }
+});
+
+// Обновление отображения профиля
+function updateProfileDisplay() {
+    if (userProfile) {
+        profileName.textContent = userProfile.name;
+        profilePhone.textContent = userProfile.phone;
+        profileAddress.textContent = userProfile.address;
+    }
+}
+
+// Навигация
+navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const page = btn.dataset.page;
+        switchPage(page);
+    });
+});
+
+function switchPage(page) {
+    currentPage = page;
+    
+    // Обновляем активную кнопку
+    navBtns.forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-page="${page}"]`).classList.add('active');
+    
+    // Скрываем все страницы
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    
+    // Показываем нужную страницу
+    if (page === 'home') {
+        document.getElementById('homePage').style.display = 'block';
+        renderFruits(fruitsGrid);
+    } else if (page === 'catalog') {
+        document.getElementById('catalogPage').style.display = 'block';
+        renderFruits(catalogGrid);
+    } else if (page === 'cart') {
+        document.getElementById('cartPage').style.display = 'block';
+        updateCartUI();
+    } else if (page === 'profile') {
+        document.getElementById('profilePage').style.display = 'block';
+        updateProfileDisplay();
+    }
+}
 
 // Загрузка фруктов
 async function loadFruits() {
@@ -99,7 +202,7 @@ async function loadFruits() {
     // Сначала устанавливаем встроенные данные (на случай если API не работает)
     fruits = [...defaultFruits];
     console.log('Установлены встроенные фрукты:', fruits.length);
-    renderFruits();
+    renderFruits(fruitsGrid);
     
     try {
         // Пробуем загрузить с API
@@ -117,7 +220,7 @@ async function loadFruits() {
             console.log('Получены данные с API:', data.length);
             if (Array.isArray(data) && data.length > 0) {
                 fruits = data;
-                renderFruits();
+                renderFruits(fruitsGrid);
             }
         } else {
             console.log('API вернул статус:', response.status);
@@ -129,19 +232,19 @@ async function loadFruits() {
 }
 
 // Отображение фруктов
-function renderFruits() {
+function renderFruits(container) {
     console.log('renderFruits вызвана, fruits:', fruits?.length);
     
-    if (!fruitsGrid) {
-        console.error('fruitsGrid не найден!');
+    if (!container) {
+        console.error('Контейнер не найден!');
         return;
     }
     
-    fruitsGrid.innerHTML = '';
+    container.innerHTML = '';
     
     if (!fruits || fruits.length === 0) {
         console.log('Нет фруктов для отображения');
-        fruitsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Загрузка фруктов...</p>';
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Загрузка фруктов...</p>';
         return;
     }
     
@@ -155,7 +258,7 @@ function renderFruits() {
 
     console.log('Отфильтровано фруктов:', filtered.length);
     if (filtered.length === 0) {
-        fruitsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Фрукты не найдены</p>';
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 20px;">Фрукты не найдены</p>';
         return;
     }
 
@@ -171,7 +274,7 @@ function renderFruits() {
                 В корзину
             </button>
         `;
-        fruitsGrid.appendChild(card);
+        container.appendChild(card);
     });
 }
 
@@ -198,6 +301,8 @@ function addToCart(fruitId) {
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');
     }
+    
+    showNotification('Добавлено в корзину!', 'success');
 }
 
 // Удаление из корзины
@@ -237,9 +342,14 @@ function saveCart() {
 
 // Обновление UI корзины
 function updateCartUI() {
-    // Обновление счетчика
+    // Обновление счетчика в навигации
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
+    if (totalItems > 0) {
+        navCartCount.textContent = totalItems;
+        navCartCount.style.display = 'block';
+    } else {
+        navCartCount.style.display = 'none';
+    }
 
     // Обновление списка товаров
     if (cart.length === 0) {
@@ -269,20 +379,6 @@ function updateCartUI() {
     cartTotal.textContent = `${total} ₽`;
 }
 
-// Открытие корзины
-function openCart() {
-    cartSidebar.classList.add('open');
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-// Закрытие корзины
-function closeCartSidebar() {
-    cartSidebar.classList.remove('open');
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
 // Оформление заказа
 async function checkout() {
     if (cart.length === 0) return;
@@ -303,7 +399,8 @@ async function checkout() {
                 user: {
                     id: user.id,
                     first_name: user.first_name,
-                    username: user.username
+                    username: user.username,
+                    ...userProfile
                 }
             })
         });
@@ -315,7 +412,7 @@ async function checkout() {
             cart = [];
             saveCart();
             updateCartUI();
-            closeCartSidebar();
+            switchPage('home');
 
             // Показ уведомления
             showNotification('Заказ успешно оформлен!', 'success');
@@ -338,15 +435,12 @@ async function checkout() {
 }
 
 // Обработчики событий
-cartIcon.addEventListener('click', openCart);
-closeCart.addEventListener('click', closeCartSidebar);
-overlay.addEventListener('click', closeCartSidebar);
 checkoutBtn.addEventListener('click', checkout);
 
 // Поиск
 searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value;
-    renderFruits();
+    renderFruits(fruitsGrid);
 });
 
 // Фильтр по категориям
@@ -355,17 +449,19 @@ categoryBtns.forEach(btn => {
         categoryBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentCategory = btn.dataset.category;
-        renderFruits();
+        renderFruits(fruitsGrid);
     });
 });
 
 // Инициализация после загрузки DOM
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        checkRegistration();
         loadFruits();
         updateCartUI();
     });
 } else {
+    checkRegistration();
     loadFruits();
     updateCartUI();
 }
