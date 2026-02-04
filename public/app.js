@@ -720,3 +720,4 @@ if (document.readyState === 'loading') {
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
 window.updateQuantity = updateQuantity;
+window.updateCartFromCard = updateCartFromCard;
