@@ -2,10 +2,60 @@
 const tg = window.Telegram?.WebApp || {
     ready: () => {},
     expand: () => {},
-    showAlert: (msg) => alert(msg),
+    showAlert: (msg) => {
+        try {
+            if (window.Telegram?.WebApp?.showAlert) {
+                window.Telegram.WebApp.showAlert(msg);
+            } else {
+                alert(msg);
+            }
+        } catch (e) {
+            alert(msg);
+        }
+    },
     HapticFeedback: null,
     initDataUnsafe: {}
 };
+
+// Безопасная функция для показа уведомлений
+function showNotification(message, type = 'info') {
+    try {
+        // Пробуем использовать showAlert
+        if (tg.showAlert && typeof tg.showAlert === 'function') {
+            tg.showAlert(message);
+            return;
+        }
+    } catch (e) {
+        console.log('showAlert не поддерживается, используем fallback');
+    }
+    
+    // Fallback: показываем сообщение в интерфейсе
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        z-index: 10000;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        font-size: 16px;
+        max-width: 80%;
+        text-align: center;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.3s';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
 tg.ready();
 tg.expand();
 
@@ -268,18 +318,22 @@ async function checkout() {
             closeCartSidebar();
 
             // Показ уведомления
-            tg.showAlert('Заказ успешно оформлен!');
+            showNotification('Заказ успешно оформлен!', 'success');
             
             // Вибрация
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
+            try {
+                if (tg.HapticFeedback && tg.HapticFeedback.notificationOccurred) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+            } catch (e) {
+                // Игнорируем ошибки вибрации
             }
         } else {
-            tg.showAlert('Ошибка при оформлении заказа');
+            showNotification('Ошибка при оформлении заказа', 'error');
         }
     } catch (error) {
         console.error('Ошибка оформления заказа:', error);
-        tg.showAlert('Ошибка при оформлении заказа');
+        showNotification('Ошибка при оформлении заказа', 'error');
     }
 }
 
