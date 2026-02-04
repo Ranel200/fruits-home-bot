@@ -72,18 +72,8 @@ app.post('/api/orders', (req, res) => {
   res.json({ success: true, order });
 });
 
-// Отдаем статические файлы из public
-app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    } else if (filePath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    }
-  }
-}));
-
-// Отдаем главную страницу
+// На Vercel статические файлы обслуживаются автоматически
+// Отдаем только главную страницу и API
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
