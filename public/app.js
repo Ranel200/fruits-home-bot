@@ -31,29 +31,79 @@ function showNotification(message, type = 'info') {
     
     // Fallback: показываем сообщение в интерфейсе
     const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 10px;
-        z-index: 10000;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        font-size: 16px;
-        max-width: 80%;
-        text-align: center;
+    
+    if (type === 'success') {
+        // Красивое зеленое уведомление для успешных действий
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 18px 25px;
+            border-radius: 15px;
+            z-index: 10000;
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+            font-size: 17px;
+            font-weight: 600;
+            max-width: 85%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease-out;
+        `;
+        notification.innerHTML = `
+            <span style="font-size: 24px;">✅</span>
+            <span>${message}</span>
+        `;
+    } else {
+        // Обычное уведомление для ошибок
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f44336;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            font-size: 16px;
+            max-width: 80%;
+            text-align: center;
+        `;
+        notification.textContent = message;
+    }
+    
+    // Добавляем анимацию
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
     `;
-    notification.textContent = message;
+    document.head.appendChild(style);
+    
     document.body.appendChild(notification);
     
     setTimeout(() => {
         notification.style.opacity = '0';
-        notification.style.transition = 'opacity 0.3s';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+        notification.style.transition = 'opacity 0.4s ease-out';
+        setTimeout(() => {
+            notification.remove();
+            style.remove();
+        }, 400);
+    }, 4000);
 }
 
 tg.ready();
@@ -334,8 +384,6 @@ function addToCart(fruitId) {
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');
     }
-    
-    showNotification('Добавлено в корзину!', 'success');
 }
 
 // Удаление из корзины
